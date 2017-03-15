@@ -44,10 +44,10 @@ public:
 
 		VectorXd dw = nw*delta*diff*this->output;
 		double db = nb*delta;
-		auto watch = dw.data();
+		
 		this->weight -= dw;
 		this->bias -= db;
-		auto ret = delta*this->weight;
+		VectorXd ret = delta*this->weight;
 
 		return ret;
 	}

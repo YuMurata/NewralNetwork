@@ -16,6 +16,7 @@ public:
 
 	vector<Layer> network;
 	OutFunc out_func;
+
 	NewralNetWork(const Params &params)
 		:out_func(params.second)
 	{
@@ -70,6 +71,7 @@ public:
 
 	void Learn(const DataList &data_list, const double &threshold=1e-3)
 	{
+	
 		auto learn_num = size(data_list);
 		for (int i=0;i<learn_num;++i)
 		{
@@ -77,6 +79,12 @@ public:
 
 			VectorXd input = data_list[i].first;
 			VectorXd t = data_list[i].second;
+
+			auto drop_func = [](Layer &x)
+			{
+				x.MakeDrop();
+			};
+			for_each(begin(this->network), end(this->network) - 1, drop_func);
 
 			VectorXd output=this->Forward(input);
 			VectorXd deltas = output - t;
@@ -89,6 +97,11 @@ public:
 				deltas = output - t;
 				MSE = deltas.array().square().sum()*0.5;
 			}
+		}
+
+		for (auto &i : this->network)
+		{
+			i.InitDrop();
 		}
 	}
 };

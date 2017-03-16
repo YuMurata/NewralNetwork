@@ -10,9 +10,33 @@ public:
 	int input_num;
 	int output_num;
 
+	VectorXd input;
+	VectorXd conversion;
+	VectorXd output;
+
+	MatrixXd weight;
+	VectorXd bias;
+	
+	Newron::ActFunc func;
+
 	VectorXd drop_mask;
 
 	Layer(const int &input_num, const int &output_num, const Newron::ActFunc &func)
+		:input_num(input_num), output_num(output_num),func(func)
+	{
+		this->weight = MatrixXd::Random(input_num, output_num);
+		this->bias = VectorXd::Random(output_num);
+
+		this->input.resize(input_num);
+
+		this->conversion.resize(output_num);
+		this->output.resize(output_num);
+
+		this->InitDrop();
+	}
+
+	//newron‚ğl‚¦‚½ê‡
+	/*Layer(const int &input_num, const int &output_num, const Newron::ActFunc &func)
 		:input_num(input_num), output_num(output_num)
 	{
 		auto gen_func = [&input_num,&func]()
@@ -25,7 +49,7 @@ public:
 		generate_n(back_inserter(this->layer), output_num, gen_func);
 
 		this->InitDrop();
-	}
+	}*/
 
 	void MakeDrop()
 	{
@@ -48,6 +72,22 @@ public:
 
 	VectorXd Forward(const VectorXd &input)
 	{
+		this->input = input;
+		for (int i = 0; i < this->output_num; ++i)
+		{
+			VectorXd col = this->weight.col(i);
+			this->conversion(i) = col.dot(this->input)+this->bias(i);
+			this->output(i) = this->func(this->conversion(i));
+		}
+
+		this->output.array() *= this->drop_mask.array();
+
+		return this->output;
+	}
+
+	//newron‚ğl‚¦‚½ê‡
+	/*VectorXd Forward(const VectorXd &input)
+	{
 		auto ret_size = size(layer);
 		VectorXd ret(ret_size);
 
@@ -62,18 +102,51 @@ public:
 		ret = Map<VectorXd>(temp.data(), ret_size);
 		ret.array()*= this->drop_mask.array();
 		return ret;
-	}
+	}*/
 
 	VectorXd Backward(const VectorXd &deltas)
+	{
+		const double nw = 0.1;
+		const double nb = 0.01;
+
+		VectorXd mask_delta = deltas.array()*this->drop_mask.array();
+
+		VectorXd ret = VectorXd::Zero(this->input_num);
+		for (int i = 0; i < this->input_num; ++i)
+		{
+			VectorXd row = this->weight.row(i);
+			auto dot = row.dot(mask_delta);
+			auto diff = MathPlus::Differential(this->input(i), this->func);
+			ret(i) = dot*diff;
+		}
+
+		MatrixXd dw = MatrixXd::Zero(this->input_num, this->output_num);
+		for (int i = 0; i < this->output_num; ++i)
+		{
+			dw.col(i) = nw*this->input*mask_delta(i)*MathPlus::Differential(this->conversion(i),this->func);
+		}
+
+		VectorXd db = nb*mask_delta;
+
+		this->weight -= dw;
+		this->bias -= db;
+
+
+		//return VectorXd::Zero(1);
+		return ret;
+	}
+
+	//newron
+	/*VectorXd Backward(const VectorXd &deltas)
 	{
 		VectorXd ret = VectorXd::Zero(this->input_num);
 		VectorXd mask_delta=deltas.array()*this->drop_mask.array();
 		
 		for (int i = 0; i<this->output_num; ++i)
 		{
-			ret += this->layer[i].Backward(mask_delta(i));
+			ret(i)= this->layer[i].Backward(mask_delta,i);
 		}
 		
 		return ret;
-	}
+	}*/
 };

@@ -4,7 +4,7 @@ class Newron
 {
 public:
 	using ActFunc = function<double(const double &)>;
-	VectorXd input;
+	double input;
 	int input_num;
 	double output;
 
@@ -23,32 +23,29 @@ public:
 
 	double Forward(const VectorXd &input)
 	{
-		this->input = input;
-		auto Dot = input.dot(this->weight);
-		auto ret = this->func(Dot+this->bias);
-		this->output = ret;
+		auto dot = input.dot(this->weight);
+		this->input = dot+this->bias;
+		this->output = this->func(this->input);
 		
-		return ret;
+		return this->output;
 	}
 
-	VectorXd Backward(const double &delta)
+	double Backward(const VectorXd &delta,const int &delta_index)
 	{
-		const auto nw = 1e-2;
-		const auto nb = 1e-2;
-		VectorXd diff(this->input_num);
+		const auto nw = 0.1;
+		const auto nb = 0.1;
+		
+		auto diff = MathPlus::Differential(this->input, this->func);
+		auto dot = delta.dot(this->weight);
+		double ret_delta = dot*diff;
 
-		for (int i = 0; i < this->input_num; ++i)
-		{
-			diff(i) = MathPlus::Differential(this->input(i), func);
-		}
-
-		VectorXd dw = nw*delta*diff*this->output;
-		double db = nb*delta;
+		VectorXd dw = nw*delta*this->output;
+		double db = nb*delta(delta_index);
 		
 		this->weight -= dw;
 		this->bias -= db;
-		VectorXd ret = delta*this->weight;
 
-		return ret;
+
+		return ret_delta;
 	}
 };

@@ -8,7 +8,7 @@
 
 int main()
 {
-	int learn_num = 100;
+	int learn_num = 1000;
 
 	NewralNetWork::DataList data_list(learn_num);
 	Randomer obj;

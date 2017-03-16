@@ -109,28 +109,29 @@ public:
 		const double nw = 0.1;
 		const double nb = 0.01;
 
-		VectorXd mask_delta = deltas.array()*this->drop_mask.array();
+		VectorXd mask_deltas = deltas.array()*this->drop_mask.array();
+
+
+		MatrixXd dw = MatrixXd::Zero(this->input_num, this->output_num);
+		for (int i = 0; i < this->output_num; ++i)
+		{
+			auto diff=MathPlus::Differential(this->conversion(i),this->func);
+			auto delta = mask_deltas(i)*diff;
+			dw.col(i) = nw*delta*this->input;
+		}
+
+		VectorXd db = nb*mask_deltas;
+
+		this->weight -= dw;
+		this->bias -= db;
 
 		VectorXd ret = VectorXd::Zero(this->input_num);
 		for (int i = 0; i < this->input_num; ++i)
 		{
 			VectorXd row = this->weight.row(i);
-			auto dot = row.dot(mask_delta);
-			auto diff = MathPlus::Differential(this->input(i), this->func);
-			ret(i) = dot*diff;
+			auto dot = row.dot(mask_deltas);
+			ret(i) = dot;
 		}
-
-		MatrixXd dw = MatrixXd::Zero(this->input_num, this->output_num);
-		for (int i = 0; i < this->output_num; ++i)
-		{
-			dw.col(i) = nw*this->input*mask_delta(i)*MathPlus::Differential(this->conversion(i),this->func);
-		}
-
-		VectorXd db = nb*mask_delta;
-
-		this->weight -= dw;
-		this->bias -= db;
-
 
 		//return VectorXd::Zero(1);
 		return ret;

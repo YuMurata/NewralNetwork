@@ -20,8 +20,8 @@ public:
 	NewralNetWork(const Params &params)
 		:out_func(params.second)
 	{
-		srand(time(NULL));
-
+		srand(time_t(NULL));
+		
 		auto net_size = size(params.first);
 		this->network.reserve(net_size);
 		for (int i = 0; i<net_size - 1; ++i)

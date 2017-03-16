@@ -1,8 +1,15 @@
 #pragma once
 
+
+double Identify(const double &x)
+{
+	auto ret = x;
+	return ret;
+}
+
 double ReLu(const double &x)
 {
-	auto ret = max(0., x);
+	auto ret = std::max(0., x);
 	return ret;
 }
 

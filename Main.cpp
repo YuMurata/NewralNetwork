@@ -1,23 +1,24 @@
 // NewralNetWork.cpp : コンソール アプリケーションのエントリ ポイントを定義します。
 //
 
-#include"NewralNetWork.h"
+#include"MLP.h"
 #include<Randomer.h>
-#include"ActiveFunction.h"
+#include"ActivateFunction.h"
 #include"OutputFunction.h"
 
 int main()
 {
 	using namespace std;
+	using namespace Eigen;
 
 	int learn_num = 100;
 
-	NewralNetWork::DataList data_list(learn_num);
+	MLP::DataList data_list(learn_num);
 	Randomer obj;
 
 	auto making = [&obj]()
 	{
-		NewralNetWork::Data data;
+		MLP::Data data;
 		double a = obj.rand<uniform_int_distribution<>>(0, 1);
 		double b = obj.rand<uniform_int_distribution<>>(0, 1);
 
@@ -42,7 +43,7 @@ int main()
 
 	auto Or = [&obj,&IsOr]()
 	{
-		NewralNetWork::Data data;
+		MLP::Data data;
 		double a = obj.rand<uniform_int_distribution<>>(0, 1);
 		double b = obj.rand<uniform_int_distribution<>>(0, 1);
 
@@ -56,16 +57,16 @@ int main()
 	
 	generate(begin(data_list), end(data_list), Or);
 
-	NewralNetWork::LayerParams layer_params =
+	MLP::LayerParams layer_params =
 	{
 		make_pair(2,ReLu),
 		make_pair(3,ReLu),
 		make_pair(1,ReLu),
 	};
 	;
-	NewralNetWork::Params params(make_pair(layer_params, Real));
+	MLP::Params params(make_pair(layer_params, Real));
 
-	NewralNetWork network(params);
+	MLP network(params);
 
 	network.Learn(data_list);
 

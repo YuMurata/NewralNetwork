@@ -1,9 +1,9 @@
 #pragma once
 
-VectorXd SoftMax(const VectorXd &x)
+Eigen::VectorXd SoftMax(const Eigen::VectorXd &x)
 {
 	auto x_size = x.size();
-	VectorXd ret(x_size);
+	Eigen::VectorXd ret(x_size);
 
 	auto sum = x.sum();
 
@@ -15,19 +15,19 @@ VectorXd SoftMax(const VectorXd &x)
 	return ret;
 };
 
-VectorXd OneHot(const VectorXd &x)
+Eigen::VectorXd OneHot(const Eigen::VectorXd &x)
 {
-	VectorXd::Index index;
+	Eigen::VectorXd::Index index;
 	x.maxCoeff(&index);
 
-	VectorXd ret=VectorXd::Zero(x.size());
+	Eigen::VectorXd ret=Eigen::VectorXd::Zero(x.size());
 	ret(index) = 1;
 
 	return ret;
 };
 
-VectorXd Real(const VectorXd &x)
+Eigen::VectorXd Real(const Eigen::VectorXd &x)
 {
-	VectorXd ret = x;
+	Eigen::VectorXd ret = x;
 	return ret;
 };

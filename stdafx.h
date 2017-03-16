@@ -25,6 +25,5 @@
 #include<cstdlib>
 #include<algorithm>
 #include<iterator>
-using namespace Eigen;
-using namespace std;
+#include<memory>
 

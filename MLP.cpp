@@ -3,7 +3,7 @@
 using namespace Eigen;
 using namespace std;
 
-MLP::MLP(const Params &params)
+MLP::MLP(Params &params)
 	:pimpl(new Impl(params)) {}
 
 MLP::~MLP() = default;
@@ -19,7 +19,7 @@ VectorXd MLP::Forward(const VectorXd &input)
 		new_input = output;
 	}
 
-	VectorXd ret = this->pimpl->out_func(output);
+	VectorXd ret = output;
 
 	return ret;
 }

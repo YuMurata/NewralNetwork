@@ -57,14 +57,16 @@ int main()
 	
 	generate(begin(data_list), end(data_list), Or);
 
-	MLP::LayerParams layer_params =
+	MLP::Params params
 	{
-		make_pair(2,ReLu),
-		make_pair(3,ReLu),
-		make_pair(1,ReLu),
+		//
+		//make_pair(3,unique_ptr<ActivateFunction>(new ReLu)),
+		//make_pair(1,unique_ptr<ActivateFunction>(new ReLu)),
 	};
-	;
-	MLP::Params params(make_pair(layer_params, Real));
+	
+	params.push_back(make_pair(2, move(make_unique<ReLu>())));
+	params.push_back(make_pair(3, move(make_unique<ReLu>())));
+	params.push_back(make_pair(1, move(make_unique<ReLu>())));
 
 	MLP network(params);
 

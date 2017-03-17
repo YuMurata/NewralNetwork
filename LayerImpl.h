@@ -2,6 +2,8 @@
 
 #include"Layer.h"
 
+struct ActivateFunction;
+
 struct Layer::Impl
 {
 	int input_num;
@@ -14,9 +16,9 @@ struct Layer::Impl
 	Eigen::MatrixXd weight;
 	Eigen::VectorXd bias;
 
-	ActFunc func;
+	std::unique_ptr<ActivateFunction> func;
 
 	Eigen::VectorXd drop_mask;
 
-	Impl(const int &input_num, const int &output_num, const ActFunc &func);
+	Impl(const int &input_num, const int &output_num,std::unique_ptr<ActivateFunction> &func);
 };

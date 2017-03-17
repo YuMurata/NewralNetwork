@@ -2,6 +2,8 @@
 
 #include"Layer.h"
 
+struct ActivateFunction;
+
 //Data = pair<VectorXd, VectorXd>::first = input, second = teach
 class MLP
 {
@@ -10,15 +12,13 @@ private:
 	std::unique_ptr<Impl> pimpl;
 
 public:
-	using OutFunc = std::function<Eigen::VectorXd(const Eigen::VectorXd &)>;
-	using LayerParam = std::pair<int, Layer::ActFunc>;
-	using LayerParams = std::vector<LayerParam>;
-	using Params = std::pair<LayerParams,OutFunc>;
+	using Param = std::pair<const int, std::unique_ptr<ActivateFunction>>;
+	using Params = std::vector<Param>;
 	
 	using Data = std::pair<Eigen::VectorXd, Eigen::VectorXd>;
 	using DataList = std::vector<Data>;
 
-	MLP(const Params &params);
+	MLP(Params &params);
 
 	~MLP();
 

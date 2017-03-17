@@ -1,19 +1,16 @@
 #pragma once
+#include"ActivateFunction.h"
+struct ActivateFunction;
 
 class Layer
 {
 private:
 	struct Impl;
-	std::unique_ptr<Impl> pimpl;
+	std::shared_ptr<Impl> pimpl;
 
 public:
-
-	using ActFunc = std::function<double(const double &)>;
-
-	Layer(const int &input_num, const int &output_num, const ActFunc &func);
+	Layer(const int &input_num, const int &output_num, std::unique_ptr<ActivateFunction> &func);
 	
-	Layer(const Layer &obj);
-
 	~Layer();
 
 	void MakeDrop();
@@ -24,5 +21,4 @@ public:
 
 	Eigen::VectorXd Backward(const Eigen::VectorXd &deltas);
 
-	Layer& operator=(const Layer &obj);
 };

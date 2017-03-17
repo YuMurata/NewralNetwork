@@ -1,19 +1,17 @@
 #include"LayerImpl.h"
+#include"ActivateFunction.h"
 #include<Randomer.h>
 
 using namespace Eigen;
 using namespace std;
 
-Layer::Layer(const int &input_num, const int &output_num, const ActFunc &func)
+Layer::Layer(const int &input_num, const int &output_num,unique_ptr<ActivateFunction> &func)
 	:pimpl(new Impl(input_num, output_num, func)) 
 {
 	this->InitDrop();
 }
 
 Layer::~Layer() = default;
-
-Layer::Layer(const Layer &obj)
-	:pimpl(new Impl(*obj.pimpl)) {}
 
 void Layer::MakeDrop()
 {
@@ -41,7 +39,7 @@ VectorXd Layer::Forward(const VectorXd &input)
 	{
 		VectorXd col = this->pimpl->weight.col(i);
 		this->pimpl->conversion(i) = col.dot(this->pimpl->input) + this->pimpl->bias(i);
-		this->pimpl->output(i) = this->pimpl->func(this->pimpl->conversion(i));
+		this->pimpl->output(i) = this->pimpl->func->Func(this->pimpl->conversion,i);
 	}
 
 	this->pimpl->output.array() *= this->pimpl->drop_mask.array();
@@ -60,7 +58,7 @@ VectorXd Layer::Backward(const VectorXd &deltas)
 	MatrixXd dw = MatrixXd::Zero(this->pimpl->input_num, this->pimpl->output_num);
 	for (int i = 0; i < this->pimpl->output_num; ++i)
 	{
-		auto diff = MathPlus::Differential(this->pimpl->conversion(i), this->pimpl->func);
+		auto diff = this->pimpl->func->Diff(this->pimpl->conversion(i));
 		auto delta = mask_deltas(i)*diff;
 		dw.col(i) = nw*delta*this->pimpl->input;
 	}
@@ -79,11 +77,4 @@ VectorXd Layer::Backward(const VectorXd &deltas)
 	}
 
 	return ret;
-}
-
-
-Layer& Layer::operator=(const Layer &obj)
-{
-	this->pimpl.reset(new Impl(*obj.pimpl));
-	return *this;
 }

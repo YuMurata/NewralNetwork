@@ -4,13 +4,15 @@
 #include"MLP.h"
 #include<Randomer.h>
 #include"ActivateFunction.h"
+#include"LossFunction.h"
 #include"OutputFunction.h"
+#include<Builder.h>
+
+using namespace std;
+using namespace Eigen;
 
 int main()
 {
-	using namespace std;
-	using namespace Eigen;
-
 	int learn_num = 100;
 
 	MLP::DataList data_list(learn_num);
@@ -57,16 +59,16 @@ int main()
 	
 	generate(begin(data_list), end(data_list), Or);
 
-	MLP::Params params
-	{
-		//
-		//make_pair(3,unique_ptr<ActivateFunction>(new ReLu)),
-		//make_pair(1,unique_ptr<ActivateFunction>(new ReLu)),
-	};
+	MLP::Params params;
 	
-	params.push_back(make_pair(2, move(make_unique<ReLu>())));
-	params.push_back(make_pair(3, move(make_unique<ReLu>())));
-	params.push_back(make_pair(1, move(make_unique<ReLu>())));
+	auto &layer_info = params.first;
+	auto &loss = params.second;
+
+	layer_info.push_back(make_pair(2, move(make_unique<ReLu>())));
+	layer_info.push_back(make_pair(3, move(make_unique<ReLu>())));
+	layer_info.push_back(make_pair(1, move(make_unique<ReLu>())));
+
+	loss = make_unique<MSE>();
 
 	MLP network(params);
 

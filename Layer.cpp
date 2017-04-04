@@ -1,5 +1,6 @@
 #include"LayerImpl.h"
 #include"ActivateFunction.h"
+
 #include<Randomer.h>
 
 using namespace Eigen;
@@ -11,7 +12,22 @@ Layer::Layer(const int &input_num, const int &output_num,unique_ptr<ActivateFunc
 	this->InitDrop();
 }
 
+Layer::Layer(const string &file_name)
+{
+	this->LoadFile(file_name);
+}
+
+Layer::Layer(const Layer &layer)
+{
+	this->pimpl=make_unique<Impl>(*layer.pimpl);
+}
+
 Layer::~Layer() = default;
+
+Layer& Layer::operator=(const Layer &layer)
+{
+	return *this;
+}
 
 void Layer::MakeDrop()
 {
@@ -77,4 +93,13 @@ VectorXd Layer::Backward(const VectorXd &deltas)
 	}
 
 	return ret;
+}
+
+void Layer::Disp()const
+{
+	cout << "weight:" << endl;
+	cout << this->pimpl->weight<<endl;
+
+	cout << "bias:" << endl;
+	cout << this->pimpl->bias << endl;
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include<Eigen/Core>
+
 struct ActivateFunction
 {
 	virtual double Func(const Eigen::VectorXd &vec,const Eigen::VectorXd::Index &index)const = 0;

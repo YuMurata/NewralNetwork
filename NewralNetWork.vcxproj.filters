@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ソース ファイル\Layer">
+      <UniqueIdentifier>{b00465a6-7f5b-4ef8-af43-ea9c7853eed2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Layer">
+      <UniqueIdentifier>{04fbbc4a-057f-402e-bce9-1e452ad94b2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{adee9795-77ed-4235-8ece-4a44f7575dc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -22,9 +31,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Layer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="OutputFunction.h">
@@ -39,7 +45,16 @@
     <ClInclude Include="MLPImpl.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>ヘッダー ファイル\Layer</Filter>
+    </ClInclude>
     <ClInclude Include="LayerImpl.h">
+      <Filter>ヘッダー ファイル\Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="NewralNetWork.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="LossFunction.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -57,10 +72,13 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Layer.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Layer</Filter>
     </ClCompile>
     <ClCompile Include="LayerImpl.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerFiler.cpp">
+      <Filter>ソース ファイル\Layer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

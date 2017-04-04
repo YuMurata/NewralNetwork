@@ -21,4 +21,6 @@ struct Layer::Impl
 	Eigen::VectorXd drop_mask;
 
 	Impl(const int &input_num, const int &output_num,std::unique_ptr<ActivateFunction> &func);
+
+	Impl(Impl &impl);
 };

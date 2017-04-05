@@ -18,6 +18,8 @@ public:
 	Layer(const std::string &file_name);
 
 	Layer(const Layer &layer);
+	
+	//Layer(Layer &&layer);
 
 	~Layer();
 

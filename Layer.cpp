@@ -19,13 +19,20 @@ Layer::Layer(const string &file_name)
 
 Layer::Layer(const Layer &layer)
 {
-	this->pimpl=make_unique<Impl>(*layer.pimpl);
+	auto input = *layer.pimpl;
+	this->pimpl=make_unique<Impl>(input);
 }
+
+//Layer::Layer(Layer &&layer)
+//{
+//	this->pimpl = move(layer.pimpl);
+//}
 
 Layer::~Layer() = default;
 
 Layer& Layer::operator=(const Layer &layer)
 {
+	this->pimpl = make_unique<Impl>(*layer.pimpl);
 	return *this;
 }
 

@@ -22,5 +22,5 @@ struct Layer::Impl
 
 	Impl(const int &input_num, const int &output_num,std::unique_ptr<ActivateFunction> &func);
 
-	Impl(Impl &impl);
+	Impl( Impl &impl);
 };

@@ -17,7 +17,7 @@ MLP::MLP(const string &file_name)
 
 MLP::~MLP() = default;
 
-VectorXd MLP::Forward(const VectorXd &input)
+MLP::Output MLP::Forward(const VectorXd &input)
 {
 	VectorXd output;
 	VectorXd new_input = input;
@@ -115,9 +115,8 @@ bool MLP::LoadFile(const string &file_name)
 		Layer ret(str);
 		return ret;
 	};
-
 	transform(itr, end(data_list[0]), back_inserter(this->pimpl->network),func);
-
+	
 	return true;
 }
 

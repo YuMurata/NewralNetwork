@@ -16,7 +16,7 @@ Layer::Impl::Impl(const int &input_num, const int &output_num,unique_ptr<Activat
 	this->output.resize(output_num);
 }
 
-Layer::Impl::Impl(Impl &impl)
+Layer::Impl::Impl( Impl &impl)
 {
 	this->bias = impl.bias;
 	this->conversion = impl.conversion;

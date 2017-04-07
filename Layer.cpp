@@ -75,18 +75,19 @@ VectorXd Layer::Backward(const VectorXd &deltas)
 	const double nw = 0.1;
 	const double nb = 0.01;
 
+	VectorXd reg = 0.5*this->pimpl->weight.colwise().norm();
 	VectorXd mask_deltas = deltas.array()*this->pimpl->drop_mask.array();
-
+	VectorXd regulized = mask_deltas + reg;
 
 	MatrixXd dw = MatrixXd::Zero(this->pimpl->input_num, this->pimpl->output_num);
 	for (int i = 0; i < this->pimpl->output_num; ++i)
 	{
 		auto diff = this->pimpl->func->Diff(this->pimpl->conversion(i));
-		auto delta = mask_deltas(i)*diff;
+		auto delta = regulized(i)*diff;
 		dw.col(i) = nw*delta*this->pimpl->input;
 	}
 
-	VectorXd db = nb*mask_deltas;
+	VectorXd db = nb*(mask_deltas);
 
 	this->pimpl->weight -= dw;
 	this->pimpl->bias -= db;

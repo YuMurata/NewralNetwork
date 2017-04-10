@@ -11,17 +11,17 @@ struct LossFunction
 	using Delta = double;
 	using Deltas = Eigen::VectorXd;
 
-	virtual E Func(const Output &output,const Target &target) = 0;
-	
+	virtual E Func(const Output &output, const Target &target) = 0;
+
 	virtual Deltas Diff(const Output &output, const Target &target)
 	{
-Deltas ret = output - target;
+		Deltas ret = output - target;
 		return ret;
 	}
-	
+
 	virtual Delta Diff(const Output &output, const Target &target, const int &index)
 	{
-		Deltas diff =this->Diff(output, target);
+		Deltas diff = this->Diff(output, target);
 		auto ret = diff(index);
 
 		return ret;

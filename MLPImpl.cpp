@@ -24,5 +24,6 @@ MLP::Impl::Impl(Params &params)
 		this->network.push_back(layer);
 	}
 
+	this->out = move(layer_info.back().second);
 	this->loss = move(loss);
 }

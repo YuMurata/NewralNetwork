@@ -28,7 +28,13 @@ MLP::Output MLP::Forward(const VectorXd &input)
 		new_input = output;
 	}
 
-	VectorXd ret = output;
+	auto output_num = output.size();
+	VectorXd ret =VectorXd::Zero(output_num);
+
+	for (int i = 0; i < output_num; ++i)
+	{
+		ret(i) = this->pimpl->out->Func(output, i);
+	}
 
 	return ret;
 }

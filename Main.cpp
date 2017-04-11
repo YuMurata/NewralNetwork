@@ -18,6 +18,61 @@ int main()
 	MLP::DataList data_list(learn_num);
 	Randomer obj;
 
+	struct Generator:public Randomer
+	{
+		using Data = vector<double>;
+
+		virtual int InputNum()=0;
+
+		virtual Data Input() = 0;
+
+		virtual Data Target(const Data &input) = 0;
+
+		auto Gen()
+		{
+			auto input_num = this->InputNum();
+
+			MLP::Data data;
+			auto input = this->Input();
+			auto target = this->Target(input);
+
+			data.first = Map<MLP::Input>(input.data(), input_num);
+			data.second = Map<MLP::Target>(target.data(), input_num);
+
+			return data;
+		}
+
+		virtual MLP::Target Ans(const MLP::Input &input) = 0;
+	};
+
+	struct Sin:public Generator
+	{
+		int InputNum()override
+		{
+			auto ret = 1;
+			return ret;
+		}
+
+		Data Input()override
+		{
+			auto input = this->rand<uniform_real_distribution<>>(0, 2 * 3.14);
+			Data ret{ input };
+			return ret;
+		}
+
+		Data Target(const Data &input)override
+		{
+			Data ret{ sin(input.front()) };
+			return ret;
+		}
+
+		MLP::Target Ans(const MLP::Input &input)override
+		{
+			auto ret = input.array().sin();
+			return ret;
+		}
+	};
+
 	auto Real=[&obj]()
 	{
 		MLP::Data data;
@@ -53,17 +108,26 @@ int main()
 		return data;
 	};
 	
-	generate(begin(data_list), end(data_list), Real);
+	unique_ptr<Generator> gen = make_unique<Sin>();
+	auto func = [&gen]()
+	{
+		auto ret = gen->Gen();
+		return ret;
+	};
+
+	generate(begin(data_list), end(data_list), func);
 
 	MLP::Params params;
 	
 	auto &layer_info = params.first;
 	auto &loss = params.second;
 
-	auto input_num = 1;
+	auto input_num = gen->InputNum();
 
 	layer_info.push_back(make_pair(input_num, move(make_unique<ReLu>())));
+	layer_info.push_back(make_pair(2, move(make_unique<ReLu>())));
 	layer_info.push_back(make_pair(3, move(make_unique<ReLu>())));
+	layer_info.push_back(make_pair(4, move(make_unique<Identify>())));
 	layer_info.push_back(make_pair(1, move(make_unique<ReLu>())));
 
 	loss = make_unique<MSE>();
@@ -78,11 +142,11 @@ int main()
 		vector<double> input;
 		for (int i = 0; i < input_num; ++i)
 		{
-		double dum;
-		cin >> dum;
-		input.push_back(dum);
+			double dum;
+			cin >> dum;
+			input.push_back(dum);
 		}
-		cin.clear();
+	
 		MLP::Input data=Map<MLP::Input>(input.data(),input_num);
 		
 		VectorXd output = network.Forward(data);
@@ -90,7 +154,7 @@ int main()
 		cout<<output<<endl;
 
 		cout << "t" << endl;
-		cout << data << endl;
+		cout << gen->Ans(data) << endl;
 
 		cout << "your input:" << endl;
 	}

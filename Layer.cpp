@@ -74,8 +74,9 @@ VectorXd Layer::Backward(const VectorXd &deltas)
 {
 	const double nw = 0.1;
 	const double nb = 0.01;
+	const double reg_rate = 0.5;
 
-	VectorXd reg = 0.5*this->pimpl->weight.colwise().norm();
+	VectorXd reg = reg_rate*this->pimpl->weight.colwise().norm();
 	VectorXd mask_deltas = deltas.array()*this->pimpl->drop_mask.array();
 	VectorXd regulized = mask_deltas + reg;
 

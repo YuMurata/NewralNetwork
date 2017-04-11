@@ -7,7 +7,7 @@ using namespace std;
 Layer::Impl::Impl(const int &input_num, const int &output_num,unique_ptr<ActivateFunction> &func)
 	:input_num(input_num), output_num(output_num), func(move(func))
 {
-	this->weight = MatrixXd::Random(input_num, output_num);
+	this->weight = MatrixXd::Random(input_num, output_num).array().abs();
 	this->bias = VectorXd::Random(output_num);
 
 	this->input.resize(input_num);

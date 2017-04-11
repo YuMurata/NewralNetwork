@@ -18,19 +18,15 @@ int main()
 	MLP::DataList data_list(learn_num);
 	Randomer obj;
 
-	auto making = [&obj]()
+	auto Real=[&obj]()
 	{
 		MLP::Data data;
-		double a = obj.rand<uniform_int_distribution<>>(0, 1);
-		double b = obj.rand<uniform_int_distribution<>>(0, 1);
+		double a = obj.rand<uniform_real_distribution<>>(0, 10);
+		auto c = a;//+ obj.rand<uniform_real_distribution<>>(-0.5, 0.5);
 
-		auto c = a + obj.rand<uniform_real_distribution<>>(-0.5, 0.5);
-		auto d = b + obj.rand<uniform_real_distribution<>>(-0.5, 0.5);
+		data.first = Map<MLP::Input>(&c,1);
+		data.second = Map<MLP::Target>(&a,1);
 
-		data.first =VectorXd(2);
-		data.first << c, d;
-		data.second =VectorXd(2);
-		data.second << a, b;
 		return data;
 	};
 
@@ -57,14 +53,16 @@ int main()
 		return data;
 	};
 	
-	generate(begin(data_list), end(data_list), Or);
+	generate(begin(data_list), end(data_list), Real);
 
 	MLP::Params params;
 	
 	auto &layer_info = params.first;
 	auto &loss = params.second;
 
-	layer_info.push_back(make_pair(2, move(make_unique<ReLu>())));
+	auto input_num = 1;
+
+	layer_info.push_back(make_pair(input_num, move(make_unique<ReLu>())));
 	layer_info.push_back(make_pair(3, move(make_unique<ReLu>())));
 	layer_info.push_back(make_pair(1, move(make_unique<ReLu>())));
 
@@ -75,18 +73,24 @@ int main()
 	network.Learn(data_list);
 
 	cout << "your input:" << endl;
-	double a, b;
-	while (cin >> a >> b)
+	while (1)
 	{
-		VectorXd data(2);
-		data << a, b;
-
+		vector<double> input;
+		for (int i = 0; i < input_num; ++i)
+		{
+		double dum;
+		cin >> dum;
+		input.push_back(dum);
+		}
+		cin.clear();
+		MLP::Input data=Map<MLP::Input>(input.data(),input_num);
+		
 		VectorXd output = network.Forward(data);
 		cout << "output" << endl;
 		cout<<output<<endl;
 
 		cout << "t" << endl;
-		cout << IsOr(data) << endl;
+		cout << data << endl;
 
 		cout << "your input:" << endl;
 	}

@@ -24,6 +24,8 @@ int main()
 
 		virtual int InputNum()=0;
 
+		virtual int OutputNum() = 0;
+
 		virtual Data Input() = 0;
 
 		virtual Data Target(const Data &input) = 0;
@@ -31,13 +33,14 @@ int main()
 		auto Gen()
 		{
 			auto input_num = this->InputNum();
+			auto output_num = this->OutputNum();
 
 			MLP::Data data;
 			auto input = this->Input();
 			auto target = this->Target(input);
 
 			data.first = Map<MLP::Input>(input.data(), input_num);
-			data.second = Map<MLP::Target>(target.data(), input_num);
+			data.second = Map<MLP::Target>(target.data(), output_num);
 
 			return data;
 		}
@@ -48,6 +51,12 @@ int main()
 	struct Sin:public Generator
 	{
 		int InputNum()override
+		{
+			auto ret = 1;
+			return ret;
+		}
+
+		int OutputNum()override
 		{
 			auto ret = 1;
 			return ret;
@@ -73,42 +82,117 @@ int main()
 		}
 	};
 
-	auto Real=[&obj]()
+	struct Real :public Generator
 	{
-		MLP::Data data;
-		double a = obj.rand<uniform_real_distribution<>>(0, 10);
-		auto c = a;//+ obj.rand<uniform_real_distribution<>>(-0.5, 0.5);
+		int InputNum()override
+		{
+			auto ret = 1;
+			return ret;
+		}
 
-		data.first = Map<MLP::Input>(&c,1);
-		data.second = Map<MLP::Target>(&a,1);
+		int OutputNum()override
+		{
+			auto ret = 1;
+			return ret;
+		}
 
-		return data;
+		Data Input()override
+		{
+			auto input = this->rand<uniform_real_distribution<>>(0, 10);
+			Data ret{ input };
+			return ret;
+		}
+
+		Data Target(const Data &input)override
+		{
+			Data ret{ input };
+			return ret;
+		}
+
+		MLP::Target Ans(const MLP::Input &input)override
+		{
+			auto ret = input.array();
+			return ret;
+		}
 	};
 
-	auto IsOr = [](const VectorXd &x)
+	struct Or :public Generator
 	{
-		auto sum=x.sum();
-		auto flag = sum >= 1;
+		int InputNum()override
+		{
+			auto ret = 2;
+			return ret;
+		}
 
-		auto ret = flag ? 1 : 0;
-		return ret;
+		int OutputNum()override
+		{
+			auto ret = 1;
+			return ret;
+		}
+
+		Data Input()override
+		{
+			auto input1 = 1.*this->rand<uniform_int_distribution<>>(0, 1);
+			auto input2 = 1.*this->rand<uniform_int_distribution<>>(0, 1);
+			Data ret{ input1,input2 };
+			return ret;
+		}
+
+		Data Target(const Data &input)override
+		{
+			auto target = input[0] || input[1] ? 1. : 0.;
+			Data ret{ target };
+			return ret;
+		}
+
+		MLP::Target Ans(const MLP::Input &input)override
+		{
+			auto sum = input.sum();
+			auto flag = sum >= 1;
+
+			auto ans = flag ? 1 : 0;
+			MLP::Target ret(1);
+			ret << ans;
+			return ret;
+		}
 	};
 
-	auto Or = [&obj,&IsOr]()
-	{
-		MLP::Data data;
-		double a = obj.rand<uniform_int_distribution<>>(0, 1);
-		double b = obj.rand<uniform_int_distribution<>>(0, 1);
+	//auto Real=[&obj]()
+	//{
+	//	MLP::Data data;
+	//	double a = obj.rand<uniform_real_distribution<>>(0, 10);
+	//	auto c = a;//+ obj.rand<uniform_real_distribution<>>(-0.5, 0.5);
 
-		data.first = VectorXd(2);
-		data.first << a, b;
-		data.second = VectorXd(1);
-		data.second << IsOr(data.first);
+	//	data.first = Map<MLP::Input>(&c,1);
+	//	data.second = Map<MLP::Target>(&a,1);
 
-		return data;
-	};
+	//	return data;
+	//};
+
+	//auto IsOr = [](const VectorXd &x)
+	//{
+	//	auto sum=x.sum();
+	//	auto flag = sum >= 1;
+
+	//	auto ret = flag ? 1 : 0;
+	//	return ret;
+	//};
+
+	//auto Or = [&obj,&IsOr]()
+	//{
+	//	MLP::Data data;
+	//	double a = obj.rand<uniform_int_distribution<>>(0, 1);
+	//	double b = obj.rand<uniform_int_distribution<>>(0, 1);
+
+	//	data.first = VectorXd(2);
+	//	data.first << a, b;
+	//	data.second = VectorXd(1);
+	//	data.second << IsOr(data.first);
+
+	//	return data;
+	//};
 	
-	unique_ptr<Generator> gen = make_unique<Sin>();
+	unique_ptr<Generator> gen = make_unique<Real>();
 	auto func = [&gen]()
 	{
 		auto ret = gen->Gen();
@@ -123,13 +207,12 @@ int main()
 	auto &loss = params.second;
 
 	auto input_num = gen->InputNum();
+	auto output_num = gen->OutputNum();
 
-	layer_info.push_back(make_pair(input_num, move(make_unique<ReLu>())));
-	layer_info.push_back(make_pair(2, move(make_unique<ReLu>())));
-	layer_info.push_back(make_pair(3, move(make_unique<ReLu>())));
-	layer_info.push_back(make_pair(4, move(make_unique<Identify>())));
-	layer_info.push_back(make_pair(1, move(make_unique<ReLu>())));
-
+	layer_info.push_back(make_pair(input_num, make_unique<Identify>()));
+	layer_info.push_back(make_pair(output_num, make_unique<Identify>()));
+	
+	
 	loss = make_unique<MSE>();
 
 	MLP network(params);

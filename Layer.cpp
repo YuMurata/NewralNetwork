@@ -23,11 +23,6 @@ Layer::Layer(const Layer &layer)
 	this->pimpl=make_unique<Impl>(input);
 }
 
-//Layer::Layer(Layer &&layer)
-//{
-//	this->pimpl = move(layer.pimpl);
-//}
-
 Layer::~Layer() = default;
 
 Layer& Layer::operator=(const Layer &layer)
@@ -66,17 +61,16 @@ VectorXd Layer::Forward(const VectorXd &input)
 	}
 
 	this->pimpl->output.array() *= this->pimpl->drop_mask.array();
-
 	return this->pimpl->output;
 }
 
 VectorXd Layer::Backward(const VectorXd &deltas)
 {
 	const double nw = 0.1;
-	const double nb = 0.01;
+	const double nb = 0.1;
 	const double reg_rate = 0.5;
 
-	VectorXd reg = reg_rate*this->pimpl->weight.colwise().norm();
+	VectorXd reg = reg_rate*this->pimpl->weight.colwise().norm()*0;
 	VectorXd mask_deltas = deltas.array()*this->pimpl->drop_mask.array();
 	VectorXd regulized = mask_deltas + reg;
 
@@ -100,15 +94,29 @@ VectorXd Layer::Backward(const VectorXd &deltas)
 		auto dot = row.dot(mask_deltas);
 		ret(i) = dot;
 	}
-
+	
 	return ret;
 }
 
 void Layer::Disp()const
 {
+	cout << "input:" << endl;
+	cout << this->pimpl->input << endl << endl;;
+
 	cout << "weight:" << endl;
-	cout << this->pimpl->weight<<endl;
+	cout << this->pimpl->weight<<endl<<endl;
 
 	cout << "bias:" << endl;
-	cout << this->pimpl->bias << endl;
+	cout << this->pimpl->bias << endl<<endl;
+
+	cout << "conv:" << endl;
+	cout << this->pimpl->conversion << endl << endl;
+
+	cout << "func:" << endl;
+	cout << typeid(*this->pimpl->func).name() << endl<<endl;
+
+	cout << "output:" << endl;
+	cout << this->pimpl->output << endl<<endl;
+
+
 }

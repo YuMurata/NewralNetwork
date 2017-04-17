@@ -17,7 +17,7 @@ MLP::MLP(const string &file_name)
 
 MLP::~MLP() = default;
 
-MLP::Output MLP::Forward(const VectorXd &input)
+MLP::Output MLP::Forward(const Input &input)
 {
 	VectorXd output;
 	VectorXd new_input = input;
@@ -57,30 +57,61 @@ VectorXd MLP::Backward(const VectorXd &deltas)
 	return new_deltas;
 }
 
+static void Result(const MLP::Output &output,const MLP::Target &t, const const LossFunction::Deltas &deltas, const LossFunction::E &E)
+{
+	auto line = "$$$$$$$$$$$$$$$$$$$$$$$$$$";
+
+	cout << line << endl << endl;
+
+	cout << "output:" << endl;
+	cout << output << endl << endl;
+
+	cout << "target:" << endl;
+	cout << t << endl << endl;
+
+	cout << "deltas:" << endl;
+	cout<<deltas <<endl<< endl;
+
+	cout << "E:" << endl;
+	cout << E << endl << endl;
+
+	cout << line << endl << endl;
+}
+
 void MLP::Disp()const
 {
 	auto net_size = size(this->pimpl->network);
-	
+
+	auto line = "------------------";
+	auto big_line = "##########################";
+
+	cout << big_line << endl;
 	for (int i = 0; i < net_size; ++i)
 	{
-		cout << i << ":" << endl;
+		cout << line << endl;
+		cout <<"layer"<< i << ":" << endl;
 		this->pimpl->network[i].Disp();
+		cout << line << endl;
 	}
+	cout << big_line << endl;
 }
 
 void MLP::Learn(const DataList &data_list, const double &threshold)
 {
 	auto learn_num = size(data_list);
+	auto line = "||||||||||||||||||||||||||||||";
+
 	for (int i = 0; i<learn_num; ++i)
 	{
-		cout << i << endl;
+		cout << line << endl << endl;
+		cout <<"learn"<< i << endl;
 
-		VectorXd input = data_list[i].first;
-		VectorXd t = data_list[i].second;
+		Input input = data_list[i].first;
+		Target t = data_list[i].second;
 
 		auto drop_func = [](Layer &x)
 		{
-			x.MakeDrop();
+	//		x.MakeDrop();
 		};
 		for_each(begin(this->pimpl->network), end(this->pimpl->network) - 1, drop_func);
 
@@ -88,13 +119,25 @@ void MLP::Learn(const DataList &data_list, const double &threshold)
 		LossFunction::Deltas deltas = this->pimpl->loss->Diff(output, t);
 		LossFunction::E E = this->pimpl->loss->Func(output, t);
 
+		this->Disp();
+		Result(output, t, deltas, E);
+
+		_getch();
+
 		while (E > threshold)
 		{
 			this->Backward(deltas);
 			output = this->Forward(input);
 			deltas = this->pimpl->loss->Diff(output, t);
 			E = this->pimpl->loss->Func(output, t);
+			
+			this->Disp();
+			Result(output, t, deltas, E);
+
+			_getch();
 		}
+
+		cout << line << endl;
 	}
 
 	for (auto &i : this->pimpl->network)

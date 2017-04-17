@@ -66,8 +66,8 @@ VectorXd Layer::Forward(const VectorXd &input)
 
 VectorXd Layer::Backward(const VectorXd &deltas)
 {
-	const double nw = 0.1;
-	const double nb = 0.1;
+	const double nw = 0.01;
+	const double nb = 0.01;
 	const double reg_rate = 0.5;
 
 	VectorXd reg = reg_rate*this->pimpl->weight.colwise().norm()*0;

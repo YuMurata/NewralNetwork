@@ -156,43 +156,8 @@ int main()
 			return ret;
 		}
 	};
-
-	//auto Real=[&obj]()
-	//{
-	//	MLP::Data data;
-	//	double a = obj.rand<uniform_real_distribution<>>(0, 10);
-	//	auto c = a;//+ obj.rand<uniform_real_distribution<>>(-0.5, 0.5);
-
-	//	data.first = Map<MLP::Input>(&c,1);
-	//	data.second = Map<MLP::Target>(&a,1);
-
-	//	return data;
-	//};
-
-	//auto IsOr = [](const VectorXd &x)
-	//{
-	//	auto sum=x.sum();
-	//	auto flag = sum >= 1;
-
-	//	auto ret = flag ? 1 : 0;
-	//	return ret;
-	//};
-
-	//auto Or = [&obj,&IsOr]()
-	//{
-	//	MLP::Data data;
-	//	double a = obj.rand<uniform_int_distribution<>>(0, 1);
-	//	double b = obj.rand<uniform_int_distribution<>>(0, 1);
-
-	//	data.first = VectorXd(2);
-	//	data.first << a, b;
-	//	data.second = VectorXd(1);
-	//	data.second << IsOr(data.first);
-
-	//	return data;
-	//};
 	
-	unique_ptr<Generator> gen = make_unique<Real>();
+	unique_ptr<Generator> gen = make_unique<Or>();
 	auto func = [&gen]()
 	{
 		auto ret = gen->Gen();
@@ -209,7 +174,7 @@ int main()
 	auto input_num = gen->InputNum();
 	auto output_num = gen->OutputNum();
 
-	layer_info.push_back(make_pair(input_num, make_unique<Identify>()));
+	layer_info.push_back(make_pair(input_num, make_unique<Sigmoid>()));
 	layer_info.push_back(make_pair(output_num, make_unique<Identify>()));
 	
 	

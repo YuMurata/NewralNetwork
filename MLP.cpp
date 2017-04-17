@@ -57,11 +57,14 @@ VectorXd MLP::Backward(const VectorXd &deltas)
 	return new_deltas;
 }
 
-static void Result(const MLP::Output &output,const MLP::Target &t, const const LossFunction::Deltas &deltas, const LossFunction::E &E)
+void Result(const MLP::Input &input,const MLP::Output &output,const MLP::Target &t, const const LossFunction::Deltas &deltas, const LossFunction::E &E)
 {
 	auto line = "$$$$$$$$$$$$$$$$$$$$$$$$$$";
 
 	cout << line << endl << endl;
+
+	cout << "input:" << endl;
+	cout << input << endl << endl;
 
 	cout << "output:" << endl;
 	cout << output << endl << endl;
@@ -120,7 +123,7 @@ void MLP::Learn(const DataList &data_list, const double &threshold)
 		LossFunction::E E = this->pimpl->loss->Func(output, t);
 
 		this->Disp();
-		Result(output, t, deltas, E);
+		Result(input,output, t, deltas, E);
 
 		_getch();
 
@@ -132,7 +135,7 @@ void MLP::Learn(const DataList &data_list, const double &threshold)
 			E = this->pimpl->loss->Func(output, t);
 			
 			this->Disp();
-			Result(output, t, deltas, E);
+			Result(input,output, t, deltas, E);
 
 			_getch();
 		}

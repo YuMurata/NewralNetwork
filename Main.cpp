@@ -157,7 +157,7 @@ int main()
 		}
 	};
 	
-	unique_ptr<Generator> gen = make_unique<Or>();
+	unique_ptr<Generator> gen = make_unique<Sin>();
 	auto func = [&gen]()
 	{
 		auto ret = gen->Gen();
@@ -174,7 +174,9 @@ int main()
 	auto input_num = gen->InputNum();
 	auto output_num = gen->OutputNum();
 
-	layer_info.push_back(make_pair(input_num, make_unique<Sigmoid>()));
+	layer_info.push_back(make_pair(input_num, make_unique<ReLu>()));
+	layer_info.push_back(make_pair(input_num, make_unique<ReLu>()));
+	layer_info.push_back(make_pair(input_num, make_unique<Identify>()));
 	layer_info.push_back(make_pair(output_num, make_unique<Identify>()));
 	
 	
